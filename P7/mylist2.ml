@@ -1,3 +1,4 @@
+(*mylist2*)
 let hd = function
 	h::_ -> h
 	| [] -> raise (Failure "hd")
