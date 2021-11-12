@@ -76,11 +76,13 @@ let filter f l=
 let find_all = filter;;
 
 
-
-let rec partition f = function
-	[] -> ([],[])
-	| h::t -> let (fst,snd) = partition f t in
-		     if f h then (h::fst,snd) else (fst,h::snd)
+let partition f l =
+  let rec aux f l l1 l2 = match l with
+    [] -> (rev l1, rev l2)
+   |h::t -> if f h
+      then aux f t (h::l1) l2
+      else aux f t l1 (h::l2)
+    in aux f l [] []
 ;;
 
 
