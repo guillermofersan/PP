@@ -676,6 +676,192 @@ let rec i_sort f = function
 - : int list = [5; 4; 3; 2; 1]
 *)
 
+(*-----------------------nov 8--------------------------*)
+
+
+
+let rec fusion l1 l2 = match l1,l2 with
+  [],l | l,[] -> l
+   |h1::t1,h2::t2 -> if h1<= h2 then h1::fusion(t1 l2)
+                else h2::fusion(l1 t2)
+;;
+
+let rec divide = function
+  h1::h2::t-> let l1 l2 = divide t in
+        h1::l1, h2::l2
+   |l -> l,[]
+;;     
+
+let mergeSort l = match l with
+  [] | [_] -> l
+   |_ -> let l1,l2=divide l in 
+        fusion (mergeSort l1) (mergeSort l2)
+;;
+
+
+
+(*-------------- problema de las reinas -------------------*)
+
+
+let come (i1,j1) (i2,j2) =
+  i1=i2 || j1=j2 || abs (i2-i1) = abs (j2-j1)
+;;
+
+let rec compatible c = function
+  []-> true;
+ |h::t -> not (come c h) && compatible c t
+;; 
+
+let reinas n =
+    let rec completa camino(i,j) =
+        if i > n then camino 
+        else if j > n then raise Not_found 
+        else if compatible (i,j) camino then
+            try completa((i,j)::camino) (i+1,1) with 
+            Not_found -> completa camino (i,j+1)
+            else completa camino (i,j+1)
+    in
+        completa [] (1,1)
+;;
+
+
+
+(*-------nov 15-------*)
+
+type 'a option =
+    Some of 'a
+  | None
+
+let (//) m n =
+    if n <> 0 then Some (m/n)
+    else None
+;;      
+
+(*problema de las reinas ocn lo de arriba*)
+
+
+let come (i1,j1) (i2,j2) =
+  i1=i2 || j1=j2 || abs (i2-i1) = abs (j2-j1)
+;;
+
+let rec compatible c = function
+  []-> true;
+ |h::t -> not (come c h) && compatible c t
+;; 
+
+(*reinas: int -> (int*int) list option*)
+let reinas n =
+    let rec completa camino(i,j) =
+        if i > n then Some camino 
+        else if j > n then None
+        else if compatible (i,j) camino then
+            match completa ((i,j)::camino) (i+1,1) with 
+            None->completa camino (i, j+1)
+            |sol->sol
+        else completa camino (i,j+1)
+    in
+        completa [] (1,1)
+;;
+
+
+(*no solucion->lista vacia
+ *solucion-> lista con sol
+ *menos elegante
+ *)
+
+(*reinas: int -> (int*int) list list*)
+let reinas n =
+    let rec completa camino(i,j) =
+        if i > n then [camino] 
+        else if j > n then []
+        else if compatible (i,j) camino then
+            match completa ((i,j)::camino) (i+1,1) with 
+            []->completa camino (i, j+1)
+            |sol->sol
+        else completa camino (i,j+1)
+    in
+        completa [] (1,1)
+;;
+
+
+(*TODAS LAS SOLUCIONES :D*)
+
+
+let all_reinas n =
+    let rec completa camino(i,j) =
+        if i > n then [camino] 
+        else if j > n then []
+        else if compatible (i,j) camino 
+        then completa ((i,j)::camino) (i+1,1) @ 
+             completa camino(i,j+1)
+        else completa camino (i,j+1)
+    in
+        completa [] (1,1)
+;;
+
+
+
+let rec print_sol = function
+    []-> print_newline()
+    |(i,j)::[] -> print_int j; print_newline()
+    |(i,j)::t -> print_int j; print_char ','; print_sol t
+;;    
+
+
+
+let reinas_sol_num n =
+    let rec completa camino(i,j) =
+        if i > n then 1
+        else if j > n then 0
+        else if compatible (i,j) camino 
+        then completa ((i,j)::camino) (i+1,1) + 
+             completa camino(i,j+1)
+        else completa camino (i,j+1)
+    in
+        completa [] (1,1)
+;;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
