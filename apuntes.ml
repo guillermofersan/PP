@@ -12,7 +12,7 @@ let id x = x;;
 
 function <x> -> <f> <x> = <f>;;
 
-let id_int : int -> int = funcion x -> x;;
+let id_int : int -> int = function x -> x;;
 
 let id_int = function (x : int) - x;;
 
@@ -515,7 +515,7 @@ h::[]->h
 
 (*FOLD, REV... 25 OCT*)
 
-let rec append l1 l2 =  match l1 wwith
+let rec append l1 l2 =  match l1 with
 []-> l2
 | h::t -> h::append t l2
 ;;
@@ -822,84 +822,287 @@ let reinas_sol_num n =
 ;;
 
 
+(*------------------17 nov-------------------*)
 
 
 
+type maybe_an_int =
+    Some of int
+  | None
+;;  
 
 
+# None;;
+- : maybe_an_int = None
+# Some 3;;
+- : maybe_an_int = Some 3
+# Some (-2);;
+- : maybe_an_int = Some (-2)
 
+# Option.Some 3;;
+- : int Option.t = Option.Some 3
+# Option.Some 'a';;
+- : char Option.t = Option.Some 'a'
 
 
 
+let (//) x y = match (x,y) with 
+    Some _, Some 0 -> None
+  | Some a, Some b -> Some (a/b)
+  | _ -> None
+;;  
+(*
+# Some 7 // Some 0 // Some 3;;    
+- : maybe_an_int = None
+# Some 0;;
+*)
 
 
 
+type booleano = V | F;;
 
 
+let (&&&) b1 b2 = match (b1,b2) with
+    V,V->V 
+  | _-> F
+;;      
+# V &&& F &&& V;;
+- : booleano = F
+# V &&& V;;
+- : booleano = V
 
 
 
 
+let v=V;;
+let (|||) b1 b2 = match (b1,b2) with
+    v,_ -> v
+  | _   -> F
+;;
+(*# F ||| V;;
+- : booleano = F ERROR, MAL DEFINIDA
+*)
 
 
+let (|||) b1 b2 = match (b1,b2) with
+    V,_| _,V -> V    
+   | _ -> F
+;;
 
+type palo = Pica | Trebol | Diamante | Corazon;;
+(*ES LO MISMO QUE*)
+type palo = Pica of unit | Trebol of unit | Diamante of unit| Corazon of unit
 
 
+type otroint = Int of int;;
 
+(*
+# Int 3;;
+- : otroint = Int 3
+# Int 56;;
+- : otroint = Int 56
+# Int 3 = Int 5;;
+- : bool = false
+# Int 3 = Int 3;;
+- : bool = true
+*)
 
+type dobleint = L of int | R of int;;
 
+type numero = F of float | I of int;;
 
 
+let rec (++) n1 n2 = match (n1,n2) with
+    I x, I y -> I (x+y)
+   | F x, F y -> F (x +. y)
+   | I x, F y -> F (float x +. y)
+   | _-> n2 ++ n1
+;;   
 
 
+(*-------------------nov 22-------------------*)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+type maybe_an_int = 
+   Some_i of int
+  |None_i
+;;
+
+type maybe_a_string =
+    Some_s of string 
+   |None_s
+;;
+
+type 'a option =
+    Some of 'a
+   |None         
+;;
+
+(*
+# Some "abc"
+  ;;
+- : string option = Some "abc"
+# Some 3;;
+- : int option = Some 3
+*)
+
+type nat =
+    O 
+   |S of nat 
+;;
+(*
+# S O;;
+- : nat = S O
+# S (S O);;
+- : nat = S (S O)
+*)
+
+let rec nat_of_int = function
+    0 -> O 
+   |n -> S (nat_of_int (n-1))
+;;
+
+let nat_of_int n = 
+    if n<0 then raise (Invalid_argument "nat_of_int")
+         else nat_of_int n 
+;;
+
+
+let rec sum n1 = function
+    O -> n1
+  | S n2 -> sum (S n1) n2 
+;;
+(*
+# let x=nat_of_int 3;;
+val x : nat = S (S (S O))
+# let y= S (S O);;    
+val y : nat = S (S O)
+# sum x y;;
+- : nat = S (S (S (S (S O))))
+# 
+*)
+
+
+
+(*-----------ÁRBOL-----------*)
+
+type 'a tree =
+    V
+  | N of 'a * 'a tree * 'a tree 
+;;
+(*
+V->vacio
+N->arbol
+
+
+# V;;
+- : 'a tree = V
+# N (3,V,V);;
+- : int tree = N (3, V, V)
+# N (3,N (1,V,V),V);;
+- : int tree = N (3, N (1, V, V), V)
+# 
+*)
+
+let h x = N (x,V,V);; (*HOJA*)
+
+                     2
+              7             5
+          2      6            9
+               5   11       4
+
+(*
+# h 3;;
+- : int tree = N (3, V, V)
+*)
+
+let t6 = N (6, h 5, h 11);;
+(*val t6 : int tree = N (6, N (5, V, V), N (11, V, V))*)
+
+let t7 = N (7,h 2, t6);;
+(*val t7 : int tree = N (7, N (2, V, V), N (6, N (5, V, V), N (11, V, V)))*)
+
+let t9 = N (9, h 4, V);;
+(*val t9 : int tree = N (9, N (4, V, V), V)*)
+
+let t5 = N (5,V, t9);;
+(*val t5 : int tree = N (5, V, N (9, N (4, V, V), V))*)
+
+let t= N (2,t7,t5);;
+(*val t : int tree =
+  N (2, N (7, N (2, V, V), N (6, N (5, V, V), N (11, V, V))),
+   N (5, V, N (9, N (4, V, V), V)))
+*)
+
+let tree2=N (2, N (7, N (2, V, V), N (6, N (5, V, V), N (11, V, V))),
+   N (5, V, N (9, N (4, V, V), V)))
+  ;;
+(*
+# t=tree2;;
+- : bool = true
+*)
+
+let rec numnodos = function
+    V->0
+  | N (_,i,d) -> 1 + numnodos i + numnodos d
+;;
+
+
+let rec altura= function
+    V->0
+  | N (_,i,d)-> 1+ max(altura i) (altura d)   
+;;
+
+
+let rec sum_nodos = function
+    V->0
+  | N (x,i,d) -> x + sum_nodos i + sum_nodos d  
+;;
+
+let rec preorder = function 
+    V -> []
+  | N (x,i,d) -> (x :: (preorder i)) @ (preorder d)  
+;;
+
+hojas
+
+mirror
+
+(*------------------BINARY TREE-------------------*)
+
+type 'a btree = 
+    Leaf of 'a
+  | Node of 'a * 'a btree * 'a btree  
+;;
+
+let rec mirror = function
+    Leaf x -> Leaf x
+  | Node (x,i,d) -> Node (x, mirror d, mirror i)
+;;
+
+
+type 'a gtree=
+    GT of 'a * 'a gtree list
+;;      
+
+# let g= GT(2,[GT(7,[h 2; h 10; GT (6, [h 5; h 11])]);GT(5,[GT(9,[h 4])])]);;
+(*val g : int gtree = GT (2,
+   [GT (7, [GT (2, []); GT (10, []); GT (6, [GT (5, []); GT (11, [])])]);
+    GT (5, [GT (9, [GT (4, [])])])])
+*)
+
+let rec nngtree = function (*cuenta el nnnnnnnnnnnnnnnnumero de nnnnnnnnnnnnnnnnnnodos*)
+    GT (_,l)-> List.fold_left (+) 1 (List.map nngtree l)
+;;    
+
+let rec nngtree = function (*esto sera otra implementacion supongo*)
+    GT (_,[])    -> 1
+  | GT (r, h::t) -> nngtree h + nngtree (GT (r,t))
+;;
+
+let rec anchura = function
+    GT (x,[]) -> [x]
+  | GT (x, GT(y,l2)::l1) -> x :: anchura (GT (y,l1@l2))
+;;
 
 
 
