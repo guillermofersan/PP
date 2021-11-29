@@ -1082,7 +1082,7 @@ let rec mirror = function
 
 type 'a gtree=
     GT of 'a * 'a gtree list
-;;      
+;;
 
 # let g= GT(2,[GT(7,[h 2; h 10; GT (6, [h 5; h 11])]);GT(5,[GT(9,[h 4])])]);;
 (*val g : int gtree = GT (2,
@@ -1109,28 +1109,98 @@ let rec anchura = function
 
 
 
+(*-------------------------------------*)
+
+
+type 'a bin_tree =
+    V
+  | N of 'a * 'a bin_tree * 'a bin_tree
+;;
+
+type 'a st_tree = 
+    Leaf of 'a
+  | Node of 'a * 'a st_tree * 'a st_tree  
+;;
+
+let rec bin_tree_of_st_tree = function
+    Leaf x -> N (x,V,V)
+  | Node (x,i,d) -> N (x,bin_tree_of_st_tree i, bin_tree_of_st_tree d) 
+;;
+
+let rec st_tree_of_bin_tree = function
+    V-> raise (Invalid_argument "st_tree_of_bin_tree")
+  | N (x,V,V) -> Leaf x 
+  | N (x,i,d) -> Node (x,st_tree_of_bin_tree i, st_tree_of_bin_tree d)
+;;
+
+let rec hojas = function
+    V -> []
+  | N (x,V,V) -> [x]
+  | N(_,i,d) -> hojas i @ hojas d
+;;    
+
+let rec leaves = function
+    V -> []
+  | N(_,i,d) -> leaves i @ leaves d
+;; 
 
 
 
 
+(*------------------general tree-----------------------*)
+
+type 'a gtree=
+    GT of 'a * 'a gtree list
+;;
+
+# let g= GT(2,[GT(7,[h 2; h 10; GT (6, [h 5; h 11])]);GT(5,[GT(9,[h 4])])]);;
+(*val g : int gtree = GT (2,
+   [GT (7, [GT (2, []); GT (10, []); GT (6, [GT (5, []); GT (11, [])])]);
+    GT (5, [GT (9, [GT (4, [])])])])
+*)
+
+let rec nngtree = function (*cuenta el nnnnnnnnnnnnnnnnumero de nnnnnnnnnnnnnnnnnnodos*)
+    GT (_,l)-> List.fold_left (+) 1 (List.map nngtree l)
+;;    
+
+let rec nngtree = function (*esto sera otra implementacion supongo*)
+    GT (_,[])    -> 1
+  | GT (r, h::t) -> nngtree h + nngtree (GT (r,t))
+;;
+
+let rec anchura = function
+    GT (x,[]) -> [x]
+  | GT (x, GT(y,l2)::l1) -> x :: anchura (GT (y,l1@l2))
+;;
 
 
 
+(***********************************************)
+
+# output_char;;          
+- : out_channel -> char -> unit = <fun>
+# stdout;;
+- : out_channel = <abstr>
+
+
+# output_char stdout 'X';;
+X- : unit = ()
 
 
 
+# let print_char c = output_char stdout c;;
+val print_char : char -> unit = <fun>
+# print_char 'X';;
+X- : unit = ()
+# print_char;;
+- : char -> unit = <fun>
+# Stdlib.print_char;;
+- : char -> unit = <fun>
 
 
+<e1> ; <e2>
 
-
-
-
-
-
-
-
-
-
+let _ = <e1> in <e2>
 
 
 

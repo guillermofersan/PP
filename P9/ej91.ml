@@ -30,9 +30,12 @@ let power x y =
 
 (*---*)
 let incseg l =
-    List.rev(List.fold_left (fun x t -> x::List.map ((+) x) t) l [])
+    List.fold_left (fun x t -> x @ List.map ((+) x) t) [] l
 ;;
 
+let incseg l =
+List.fold_right (fun x t -> x::List.map ((+) x) t) l []
+;;
 
 let remove x l= 
     let rec aux l2 = function
