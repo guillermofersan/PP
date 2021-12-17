@@ -1116,8 +1116,8 @@ let rec nngtree = function (*esto sera otra implementacion supongo*)
 ;;
 
 let rec anchura = function
-    GT (x,[]) -> [x]
-  | GT (x, GT(y,l2)::l1) -> x :: anchura (GT (y,l1@l2))
+    Gt (x,[]) -> [x]
+  | Gt (x, Gt(y,l2)::l1) -> x :: anchura (Gt (y,l1@l2))
 ;;
 
 
