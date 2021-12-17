@@ -635,7 +635,23 @@ let crono f x =
   Sys.time () -. t
 ;;
 
+let rec qsort1 ord = function
+    [] -> []
+  | h::t -> let after, before = List.partition (ord h) t in
+            qsort1 ord before @ h :: qsort1 ord after
+;;
 
+let qsort1aux l =
+    qsort1 (<=) l;;
+
+let qsort2aux l =
+    qsort2 (<=) l;;
+
+let msort2aux l =
+    msort2 (<=) l;;    
+
+let msort1aux l =
+    msort1 (<=) l;;    
 
 (*
 # crono isort (List.init 10_000 (function _ -> Random.int 1_000_000));; 
@@ -713,7 +729,7 @@ let rec compatible c = function
 ;; 
 
 let reinas n =
-    let rec completa camino(i,j) =
+    let rec completa camino (i,j) =
         if i > n then camino 
         else if j > n then raise Not_found 
         else if compatible (i,j) camino then
@@ -1302,49 +1318,221 @@ let c = open_in "prueba"
 
 
 
+(********************************************)
 
 
+let rec output_string_list c = function
+    [] -> ()
+  | h::t -> output_string c (h ^ "\n"); output_string_list c t
+  ;;  
 
 
+let s = open_out "pruebaa";;
+output_string_list s ["AB";"ECR";"hola"];;
+close_out s;;
 
+(*
+guillemo@guillermo:~$ more pruebaa
+AB
+ECR
+hola
+*)
 
+(***********ITER***********)
 
+let rec iter p = function
+    []->()
+  | h::t -> p h; iter p t  
+;;
 
+let output_string_list c l =
+    List.iter (fun s -> output_string c (s ^ "\n")) l
+;;    
+
+(*opens (lectura) *)
+
+(*
+open_out si no existe lo crea
+open_in error si no existe
+*)
+
+let c = open_in "prueba";;
 
+let rec input_string_list c =
+    try
+        input_line c :: input_string_list c
+    with
+     End_of_file -> []
+;;     
 
 
+type 'a tree =
+    V
+  | N of 'a * 'a tree * 'a tree 
+;;
 
 
+#let f = open_out "arbol";;
+    val f : out_channel = <abstr>
+# let t = N (1,N (2, N (3,V,V), N (4,V,V)), N(5,V,V));;
+    val t : int tree = N (1, N (2, N (3, V, V), N (4, V, V)), N (5, V, V))
+# output_value f t;;
+    - : unit = ()
+# close_out f;;
+    - : unit = ()
 
+$ more arbol
+����
+$ cat arbol
+�����A�B�C@@�D@@�E@@
 
+# let e = open_in "arbol";;
+    val e : in_channel = <abstr>
+# seek_in e 0;;
+    - : unit = ()
+# let t2 = (input_value e : int tree);;
+    val t2 : int tree = N (1, N (2, N (3, V, V), N (4, V, V)), N (5, V, V))
 
 
 
+(***************VARIABLES*****************)
+
+
+# let i = ref 8;;
+    val i : int ref = {contents = 8}
+# !i;;
+    - : int = 8
+# i;;
+    - : int ref = {contents = 8}
 
+# !i + 3;;
+    - : int = 11
+
+# i := 5;; 
+    - : unit = ()
+# !i;;
+    - : int = 5
+
+
+# i := !i+1;;
+- : unit = ()
+# !i;;
+- : int = 6
 
+(********************LOOPS*******************)
+
+for i = 0+1 to 4+1 do print_endline(string_of_int i) done;;
+
+
+let fact n =
+    let f = ref 1 in
+    for i=1 to n do
+        f := !f * i
+    done;
+    !f
+;;
+
+for i = 1 to 20 do print_endline(string_of_int (fact i)) done;;
+1
+2
+6
+24
+120
+720
+5040
+40320
+362880
+3628800
+39916800
+479001600
+6227020800
+87178291200
+1307674368000
+20922789888000
+355687428096000
+6402373705728000
+121645100408832000
+2432902008176640000
 
 
 
 
+(**************************************************)
 
 
+let fact n =
+    let f = ref 1 and i = ref 1 in 
+    while !i<=n do 
+    f := !f * !i;
+    i:= !i+1;
+    done;
+    !f
+;;
 
+# [||];;
+    (*- : 'a array = [||]*)
+# let v = [|1;2;3;4;5|];;
+    (*val v : int array = [|1; 2; 3; 4; 5|]*)
 
 
+# Array.make 10 0;;
+    (*- : int array = [|0; 0; 0; 0; 0; 0; 0; 0; 0; 0|]*)
 
+# Array.init 10 (fun _ -> Random.float 1.);;
+    (*- : float array =
+    [|0.926038888360971146; 0.341638588598232096; 0.597822945853105914;
+      0.866881591014789565; 0.786668034537743921; 0.625315015859070122;
+      0.0909889847839877169; 0.311009969786768425; 0.559742196386998736;
+      0.153847848802657422|]*)
 
 
+# let v = Array.init 10 (fun _ -> Random.float 1.);;
+val v : float array =
+ (*) [|0.00976621539525168; 0.756637587325766692; 0.248343259525787813;
+    0.652787092477089326; 0.98717731495272254; 0.167445477467496828;
+    0.557458224883505826; 0.758516786217373; 0.68532904647625259;
+    0.46752184914410938|]*)
+# let w = Array.copy v;;
+val w : float array =
+  (*[|0.00976621539525168; 0.756637587325766692; 0.248343259525787813;
+    0.652787092477089326; 0.98717731495272254; 0.167445477467496828;
+    0.557458224883505826; 0.758516786217373; 0.68532904647625259;
+    0.46752184914410938|]*)
 
 
+(*******Producto escalar********)    
 
+let vprod v1 v2=
+    let l = Array.length v1 in 
+    if Array.length v2 = l then
+        let p= ref 0. in 
+        for i=0 to l-1 do 
+            p:= !p +. v1.(i) *. v2.(i)
+        done;
+        !p 
+    else 
+        raise (Invalid_argument "vprod")
+;;
 
 
+# vprod v w;;
+(*- : float = 3.63731818809045127*)
 
 
+let vprod2 v1 v2 = 
+    Array.fold_left (+.) 0. (Array.map2 ( *. ) v1 v2)
+;;    
 
+# vprod2 v w;;
+(*- : float = 3.63731818809045127*)
 
 
+(**********************REGISTROS****************************)
 
+type persona = {nombre : string; edad : int};;
+    (*type persona = { nombre : string; edad : int; }*)
+let p1 = {nombre="Guillermo";edad=17};;
+    (*val p1 : persona = {nombre = "Guillermo"; edad = 17}*)
 
 
 
@@ -1427,6 +1615,721 @@ let c = open_in "prueba"
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+V
 
 
 

@@ -30,12 +30,13 @@ let power x y =
         else invalid_arg "power"
 ;;
 
-let incseg l = 
+let incseg l = (*REVISAR*)
     let rec aux l acc l2 = match l with
         [] -> []
         | [h] -> rev ((h + acc)::l2)
         | h::t -> aux t (h + acc) ((h + acc)::l2)
-    in aux l 0 [];;
+    in aux l 0 []
+;;
 
 
 let remove x l= 
