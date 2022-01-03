@@ -84,12 +84,29 @@ let rec peval ctx = function
 
 (*C*)
 
+let rec simple_props = function 
+    C b -> []
+  | V s -> [s]
+  | Op (o, p) -> simple_props p
+  | BiOp (b, p1, p2) -> (simple_props p1) @ (simple_props p2)
+;;
 
+
+
+let rec set = function
+    [] -> []
+  | h::t -> if mem h t
+            then set t
+        else h :: (set t)
+;;
+    
+let rec aux = function
+    [] -> [[]]
+  | h::t -> let aux2 = aux t in
+            (List.map (function c -> (h,true)::c) aux2) @ (List.map (function c -> (h,false)::c) aux2)
+;;
 
 let is_tau p =
-  let cs = ctxs (pvars p) in
-  List.for_all (function c -> peval c p) cs;;
-
-
-
-
+    let l = aux (set( simple_props p) ) in
+    List.for_all (function c -> peval c p) l
+;;
