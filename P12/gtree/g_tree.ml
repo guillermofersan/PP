@@ -22,3 +22,21 @@ let rec mirror = function
     Gt(r,[]) -> Gt(r,[]);
   | Gt(r,l)  -> Gt(r, List.rev (List.map mirror l))
 ;;
+
+
+let rec preorder t =
+    let rec aux l t = match t with
+        Gt(r,[]) -> l @ [r]
+      | Gt (r,h::[])-> r :: (l @ (aux l h))      
+      | Gt (r,h::t)  -> r :: (l @ (aux l h) @ ((fold_left (@) l (List.map preorder t))))
+    in aux [] t
+;;
+
+
+let rec postorder t =
+    let rec aux l t = match t with
+        Gt(r,[]) -> l @ [r]
+      | Gt (r,h::[])-> (l @ (aux l h)) @ [r] 
+      | Gt (r,h::t)  -> (l @ (aux l h) @ ((fold_left (@) l (List.map postorder t)))) @ [r]
+    in aux [] t
+;;
